@@ -4,6 +4,10 @@
 	1. [安装](#安装)
 	2. [破解](#破解)
 2. [markdown插件](#markdown插件)
+3. [自动注入mapper报错问题设置](#自动注入mapper报错问题设置)
+4. [Terminal 配置 git bash 中文乱码](#terminal-配置-git-bash-中文乱码)
+
+
 
 
 # Intellj安装破解
@@ -27,4 +31,24 @@
  - [更多插件用法](https://blog.csdn.net/qq_41720208/article/details/102647500)
 
 
+# 自动注入mapper报错问题设置
 
+ - 问题现象：
+![](images/38b19ee7.png)
+
+ - 解决方案:
+ 
+
+> 设置下IDE选项
+File ->Settings ->Editor -> Inspetions ->Spring ->Spring core -> Core ->Autowiring for  Bean Class
+
+![](images/458292f9.png)
+
+# Terminal 配置 git bash 中文乱码
+
+> 解决方法：
+git的安装路径下etc文件下有个 bash.bashrc 文件，在这个文件末尾追加：
+export LANG="zh_CN.UTF-8"
+export LC_ALL="zh_CN.UTF-8"
+比如我的git 安装路径就是 :C:\Program Files\Git
+我修改的就是：C:\Program Files\Git\etc\bash.bashrc 文件
