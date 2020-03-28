@@ -27,7 +27,7 @@
 
 ## markdown插件
 
- - [Paste images into MarkDown](https://www.jianshu.com/p/499c48f5de22)
+ - [向md文件插入图片](https://www.jianshu.com/p/499c48f5de22)
  - [更多插件用法](https://blog.csdn.net/qq_41720208/article/details/102647500)
 
 
