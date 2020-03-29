@@ -23,6 +23,11 @@
 	2. [设置资源属性](#设置资源属性)
 	3. [引入依赖 dependency](#引入依赖-dependency)
 	4. [注意事项](#注意事项)
+5. [整合Swagger2](#整合swagger2)
+	1. [引入依赖](#引入依赖)
+	2. [配置文件](#配置文件)
+	3. [Swagger-ui访问路径](#swagger-ui访问路径)
+	4. [生产环境禁用Swagger](#生产环境禁用swagger)
 
 # Controller接收参数的几种常用方式
 
@@ -434,4 +439,90 @@ public class QuoteApplicationTests {
             </plugin>
         </plugins>
     </build>
+	```
+# 整合Swagger2
+## 引入依赖
+
+``` xml
+<!-- swagger2 配置 -->
+<dependency>
+    <groupId>io.springfox</groupId>
+    <artifactId>springfox-swagger2</artifactId>
+    <version>2.4.0</version>
+</dependency>
+<dependency>
+    <groupId>io.springfox</groupId>
+    <artifactId>springfox-swagger-ui</artifactId>
+    <version>2.4.0</version>
+</dependency>
+<dependency>
+    <groupId>com.github.xiaoymin</groupId>
+    <artifactId>swagger-bootstrap-ui</artifactId>
+    <version>1.6</version>
+</dependency>
+```
+## 配置文件
+
+``` java
+package com.abc.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import springfox.documentation.builders.ApiInfoBuilder;
+import springfox.documentation.builders.PathSelectors;
+import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.Contact;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+@Configuration
+@EnableSwagger2
+@ConditionalOnProperty(value = "swagger2.enable", havingValue = "true")
+public class Swagger2 {
+
+//    http://localhost:8088/swagger-ui.html     原路径
+//    http://localhost:8088/doc.html     带有样式的路径
+
+    // 配置swagger2核心配置 docket
+    @Bean
+    public Docket createRestApi() {
+        return new Docket(DocumentationType.SWAGGER_2)  // 指定api类型为swagger2
+                    .apiInfo(apiInfo())                 // 用于定义api文档汇总信息
+                    .select()
+                    .apis(RequestHandlerSelectors
+                            .basePackage("com.abc.controller"))   // 指定controller包
+                    .paths(PathSelectors.any())         // 所有controller
+                    .build();
+    }
+
+    private ApiInfo apiInfo() {
+        return new ApiInfoBuilder()
+                .title("电商平台接口api")        // 文档页标题
+                .contact(new Contact("abc",
+                        "https://www.abc.com",
+                        "abc@qq.com"))        // 联系人信息
+                .description("专为吃货提供的api文档")  // 详细信息
+                .version("1.0.1")   // 文档版本号
+                .termsOfServiceUrl("https://www.abc.com") // 网站地址
+                .build();
+    }
+
+}
+```
+## Swagger-ui访问路径
+
+ - 原路径 http://localhost:8088/swagger-ui.html 
+ - 带有样式的路径 http://localhost:8088/doc.html
+
+## 生产环境禁用Swagger
+
+ - 在类```Swagger2```上加注解 ```@ConditionalOnProperty(value = "swagger2.enable", havingValue = "true")```
+	
+ - ```application.yml``` 文件新增配置参数
+		
+	``` yml
+	swagger2:
+	  enable: true
 	```
