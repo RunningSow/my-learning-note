@@ -28,6 +28,10 @@
 	2. [配置文件](#配置文件)
 	3. [Swagger-ui访问路径](#swagger-ui访问路径)
 	4. [生产环境禁用Swagger](#生产环境禁用swagger)
+6. [整合日志log4j](#整合日志log4j)
+	1. [移除SpringBoot默认日志](#移除springboot默认日志)
+	2. [添加日志框架依赖](#添加日志框架依赖)
+	3. [创建log4j.properties并且放到资源文件目录src/main/resources](#创建log4jproperties并且放到资源文件目录srcmainresources)
 
 # Controller接收参数的几种常用方式
 
@@ -526,3 +530,54 @@ public class Swagger2 {
 	swagger2:
 	  enable: true
 	```
+	
+# 整合日志log4j
+
+## 移除SpringBoot默认日志
+
+``` xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter</artifactId>
+    <exclusions>
+        <exclusion>
+            <artifactId>spring-boot-starter-logging</artifactId>
+            <groupId>org.springframework.boot</groupId>
+        </exclusion>
+    </exclusions>
+</dependency>
+```
+## 添加日志框架依赖
+
+``` xml
+<!--引入日志依赖 抽象层 与 实现层-->
+<dependency>
+    <groupId>org.slf4j</groupId>
+    <artifactId>slf4j-api</artifactId>
+    <version>1.7.21</version>
+</dependency>
+<dependency>
+    <groupId>org.slf4j</groupId>
+    <artifactId>slf4j-log4j12</artifactId>
+    <version>1.7.21</version>
+</dependency>
+```
+## 创建log4j.properties并且放到资源文件目录src/main/resources
+
+``` xml
+log4j.rootLogger=DEBUG,stdout,file
+log4j.additivity.org.apache=true
+
+log4j.appender.stdout=org.apache.log4j.ConsoleAppender
+log4j.appender.stdout.threshold=INFO
+log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
+log4j.appender.stdout.layout.ConversionPattern=%-5p %c{1}:%L - %m%n
+
+log4j.appender.file=org.apache.log4j.DailyRollingFileAppender
+log4j.appender.file.layout=org.apache.log4j.PatternLayout
+log4j.appender.file.DatePattern='.'yyyy-MM-dd-HH-mm
+log4j.appender.file.layout.ConversionPattern=%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n
+log4j.appender.file.Threshold=INFO
+log4j.appender.file.append=true
+log4j.appender.file.File=/workspaces/logs/foodie-api/mylog.log
+```
