@@ -6,6 +6,10 @@
 2. [markdown插件](#markdown插件)
 3. [自动注入mapper报错问题设置](#自动注入mapper报错问题设置)
 4. [Terminal 配置 git bash 中文乱码](#terminal-配置-git-bash-中文乱码)
+5. [热部署](#热部署)
+	1. [pom添加依赖](#pom添加依赖)
+	2. [修改spring-boot-maven-plugin](#修改spring-boot-maven-plugin)
+	3. [配置 IDEA](#配置-idea)
 
 
 
@@ -13,8 +17,8 @@
 # Intellj安装破解
 
 ## 安装
-[下载地址](https://download.jetbrains.com/idea/ideaIU-2019.2.4.exe)
-
+ [下载地址](https://download.jetbrains.com/idea/ideaIU-2019.2.4.exe)
+ 
 ## 破解
 
  - [下载破解工具](https://github.com/RunningSow/my-note/raw/master/source/jetbrains-agent-latest.zip)
@@ -48,9 +52,48 @@ File ->Settings ->Editor -> Inspetions ->Spring ->Spring core -> Core ->Autowiri
 
 解决方法： git的安装路径下etc文件下有个 bash.bashrc 文件，在这个文件末尾追加：
 
-``` bash
-export LANG="zh_CN.UTF-8" 
-export LC_ALL="zh_CN.UTF-8" 
-```
+	``` bash
+	export LANG="zh_CN.UTF-8" 
+	export LC_ALL="zh_CN.UTF-8" 
+	```
 
 比如我的git 安装路径就是 :C:\Program Files\Git 我修改的就是：C:\Program Files\Git\etc\bash.bashrc 文件
+
+# 热部署
+
+## pom添加依赖
+
+``` xml
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-devtools</artifactId>
+	<scope>runtime</scope>
+	<optional>true</optional>
+</dependency>
+```
+
+## 修改spring-boot-maven-plugin
+新增```<fork>```节点，并设置为true
+``` xml
+<build>
+	<plugins>
+		<plugin>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-maven-plugin</artifactId>
+			<configuration>
+				<fork>true</fork>
+			</configuration>
+		</plugin>
+	</plugins>
+</build>
+```
+
+## 配置 IDEA
+
+ - 选择 File | Settings | Compiler 命令，然后勾选 Build project automatically 复选框，低版本的 IDEA 请勾选 **==make project automatically==** 复选框。
+ 
+    ![](images/58db654e.png)
+	
+ - 使用快捷键 Ctrl + Shift + A，在输入框中输入 Registry，勾选 **==compile.automake.allow.when.app.running==** 复选框
+ 
+    ![](images/2d031a73.png)
