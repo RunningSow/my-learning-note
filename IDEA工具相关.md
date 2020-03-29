@@ -76,15 +76,15 @@ File ->Settings ->Editor -> Inspetions ->Spring ->Spring core -> Core ->Autowiri
 新增```<fork>```节点，并设置为true
 ``` xml
 <build>
-	<plugins>
-		<plugin>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-maven-plugin</artifactId>
-			<configuration>
-				<fork>true</fork>
-			</configuration>
-		</plugin>
-	</plugins>
+    <plugins>
+        <plugin>
+            <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <fork>true</fork>
+                </configuration>
+        </plugin>
+    </plugins>
 </build>
 ```
 
