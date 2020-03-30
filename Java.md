@@ -18,6 +18,12 @@
 	4. [MySQL事务隔离级别](#mysql事务隔离级别)
 	5. [	事务的传播机制](#事务的传播机制)
 	6. [Spring事务传播行为中可能的坑点](#spring事务传播行为中可能的坑点)
+3. [SpringAOP](#springaop)
+	1. [名词术语](#名词术语)
+	2. [通知(Advice)](#通知advice)
+	3. [切点(PointCut)](#切点pointcut)
+		1. [定义切点](#定义切点)
+	4. [使用AOP记录日志](#使用aop记录日志)
 
 # 线程池ThreadPoolExecutor
 ## 构造参数说明
@@ -242,3 +248,121 @@ public class ScheduledTest {
 ![](images/56dd63b6.png)
 
 > Spring 事务的管理控制，主要是通过AOP的动态代理增强来实现的，目标对象本身并没有任何的事务管理能力，都是通过代理对象动态增强功能去实现事务管理。在同一个service中的方法调用，相当于是目标对象本身的this调用，并没有经过代理对象，所以自然的事务配置的嵌套均无效。
+
+# SpringAOP
+## 名词术语
+
+ - 连接点（join point）:**是具体被拦截的对象**，Spring只支持拦截方法，所以被拦截的对象往往就是指特定的方法。(通知方法的入参)
+ - 切点（point cut）：是满足**指定正则表达式规则的方法**。
+ - 通知（advice）:
+	 - 前置通知（@Before）
+	 - 后置通知（@After）
+	 - 环绕通知（@Around）
+	 - 事后返回通知（@AfterReturning）
+	 - 异常通知（@AfterThrowing）
+ - 切面（aspect）：通常是一个类，在里面可以定义切入点和通知。
+ - AOP 代理：AOP 框架创建的对象，代理就是目标对象的加强。Spring 中的 AOP 代理可以使 JDK 动态代理，也可以是 CGLIB 代理，前者基于接口，后者基于子类
+
+## 通知(Advice)
+
+ - @Before前置通知：在方法调用之前执行
+ - @AfterReturning事后返回通知：在方法正常调用之后执行
+ - @Around环绕通知：在方法调用之前和之后，都分别可以执行的通知
+ - @AfterThrowing异常通知：如果在方法调用过程中发生异常，则通知
+ - @After后置通知：在方法调用之后执行
+
+## 切点(PointCut)
+
+### 定义切点
+
+ - 使用注解 ```@PointCut```
+
+	``` java
+	@Pointcut("execution(* com.imooc.service.impl..*.*(..))")
+	public void service() {}
+	```
+
+ - execution 表达式的介绍
+
+	> execution(<修饰符模式>?<返回类型模式><方法名模式>(<参数模式>)<异常模式>?)
+	> 
+	> 修饰符模式和异常模式为可选项
+	
+
+ - execution 表达式解析
+ 
+
+| 标识符               | 含义                                 |
+| -------------------- | ------------------------------------ |
+| execution（）        | 表示返回值的类型，* 代表所有返回类型 |
+| 第一个 * 符号        | 表示返回值的类型，* 代表所有返回类型 |
+| com.abc.service.impl | 要拦截的方法所在的包名               |
+| 包名后面的 ..        | 表示当前包及子包                     |
+| 第二个 *             | 表示类名，* 表示所有类               |
+| 最后的 .*(..)     | 第一个 .* 表示任何方法名，（..） 代表任何类型参数  |
+
+## 使用AOP记录日志	
+
+ - 引入依赖
+
+	``` xml
+	<dependency>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-aop</artifactId>
+	</dependency>
+	```
+
+ - 定义切面类
+ 
+	``` java
+	@Aspect
+	@Component
+	public class ServiceLogAspect {
+		private static final Logger LOG = LoggerFactory.getLogger(ServiceLogAspect.class); 
+		// TODO 下面会补全切点和通知
+	}
+	```
+- 定义切点
+
+	``` java
+	@Pointcut("execution(* com.abc.service.impl..*.*(..))")
+	public void service() {}
+	```
+
+	``` java
+	@Pointcut("execution(* com.abc.controller..*.*(..))")
+	public void controller() { }
+	```
+	- 定义环绕通知
+		- 返回值需要是```Object```
+		- 入参是```ProceedingJoinPoint```
+		- 需要执行```joinPoint.proceed();```，方法才会被调用
+    ``` java
+     @Around("controller()")  // 相当于@Around("execution(* com.abc.controller..*.*(..))")
+     public Object recordTimeLog(ProceedingJoinPoint joinPoint) throws Throwable {
+        LOG.info(
+            "====开始执行 {}.{}==参数={}=", joinPoint.getTarget().getClass(), joinPoint.getSignature().getName(), joinPoint.getArgs());
+        long start = System.currentTimeMillis();
+        Object object = joinPoint.proceed(); //执行方法
+        long end = System.currentTimeMillis();
+        long elapse = end -start;
+        LOG.info(
+                  "====执行完成 耗时{}ms== {}.{}==参数={}=",elapse, joinPoint.getTarget().getClass(), joinPoint.getSignature().getName(), joinPoint.getArgs());
+        return object;
+      }
+    ```
+	- 定义前置通知
+		- 没有返回值
+		- 入参是```JoinPoint```
+
+	``` java
+	@Before("service()")
+	 public void doBefore(JoinPoint joinPoint) {
+		  LOG.info(
+				  "===准备执行 {}.{}==参数={}=", joinPoint.getTarget().getClass(), joinPoint.getSignature().getName(), joinPoint.getArgs());
+	  }
+	```
+	- 函数说明
+		- 获取类名: ```joinPoint.getTarget().getClass()```
+        - 获取方法名: ```joinPoint.getSignature().getName()```
+		- 获取入参:  ```joinPoint.getArgs()```
