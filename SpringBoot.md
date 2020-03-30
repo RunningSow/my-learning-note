@@ -32,6 +32,10 @@
 	1. [移除SpringBoot默认日志](#移除springboot默认日志)
 	2. [添加日志框架依赖](#添加日志框架依赖)
 	3. [创建log4j.properties并且放到资源文件目录src/main/resources](#创建log4jproperties并且放到资源文件目录srcmainresources)
+7. [Springboot获取request和response方式](#springboot获取request和response方式)
+	1. [静态方法获取](#静态方法获取)
+	2. [方法参数直接获取](#方法参数直接获取)
+	3. [自动注入](#自动注入)
 
 # Controller接收参数的几种常用方式
 
@@ -581,3 +585,47 @@ log4j.appender.file.Threshold=INFO
 log4j.appender.file.append=true
 log4j.appender.file.File=/workspaces/logs/foodie-api/mylog.log
 ```
+# Springboot获取request和response方式
+
+> 来自 https://www.jianshu.com/p/b1a9fb969d9a
+
+## 静态方法获取
+
+``` java
+@GetMapping(value = "")
+public String center() {
+    ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes)RequestContextHolder.getRequestAttributes();
+    HttpServletRequest request = servletRequestAttributes.getRequest();
+    HttpServletResponse response = servletRequestAttributes.getResponse();
+    //...
+}
+
+```
+
+## 方法参数直接获取
+
+``` java
+@GetMapping(value = "")
+public String center(HttpServletRequest request,HttpServletResponse response) {
+    //...
+}
+```
+
+## 自动注入
+
+``` java
+@Autowired
+private HttpServletRequest request;
+
+@Autowired
+private HttpServletResponse response;
+
+@GetMapping(value = "")
+public String center() {
+    //...
+}
+```
+
+> Controller层中所注入的HttpServletReuqest的实现类为JDK动态代理生成的一个代理类,不会存在线程安全问题
+> 
+> 参考：https://blog.csdn.net/zknxx/article/details/77917290
