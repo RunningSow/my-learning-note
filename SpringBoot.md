@@ -155,6 +155,8 @@ spring:
 mybatis:
   type-aliases-package: com.imooc.pojo          # 所有POJO类所在包路径
   mapper-locations: classpath:mapper/*.xml      # mapper映射文件
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # 开启控制台打印sql日志
 ```
 
 ## 在yml中配置tomcat
