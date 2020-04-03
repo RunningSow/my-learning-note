@@ -244,6 +244,98 @@ issue地址：https://github.com/spring-projects/spring-boot/issues/19596
     ```
 
 
+
+## SpringBoot 整合Mybatis分页插件mybatis-pagehelper
+### 引入分页插件依赖
+
+``` xml
+<!--pagehelper -->
+<dependency>
+    <groupId>com.github.pagehelper</groupId>
+    <artifactId>pagehelper-spring-boot-starter</artifactId>
+    <version>1.2.12</version>
+</dependency>
+```
+### yml新增配置
+
+``` xml
+# 分页插件配置
+pagehelper:
+  helperDialect: mysql
+  supportMethodsArguments: true
+```
+### 使用方式
+
+``` java
+public PagedGridResult queryPagedComments(
+      String itemId, Integer level, Integer page, Integer pageSize) {
+    Map<String, Object> map = new HashMap<>();
+    map.put("itemId", itemId);
+    map.put("level", level);
+
+    // mybatis-pagehelper
+
+    /** page: 第几页 pageSize: 每页显示条数 */
+    PageHelper.startPage(page, pageSize);
+
+    List<ItemCommentVO> list = itemsCommentsMapper.queryItemComments(map);
+    return setterPagedGrid(list, page);
+  }
+
+  private PagedGridResult setterPagedGrid(List<?> list, Integer page) {
+    PageInfo<?> pageList = new PageInfo<>(list);
+	//分页数据封装到PagedGridResult.java传给前端
+    PagedGridResult grid = new PagedGridResult();
+    grid.setPage(page);
+    grid.setRows(list);
+    grid.setTotal(pageList.getPages());
+    grid.setRecords(pageList.getTotal());
+    return grid;
+  }
+```
+
+``` java
+public class PagedGridResult {
+
+  private int page; // 当前页数
+  private int total; // 总页数
+  private long records; // 总记录数
+  private List<?> rows; // 每行显示的内容
+
+  public int getPage() {
+    return page;
+  }
+
+  public void setPage(int page) {
+    this.page = page;
+  }
+
+  public int getTotal() {
+    return total;
+  }
+
+  public void setTotal(int total) {
+    this.total = total;
+  }
+
+  public long getRecords() {
+    return records;
+  }
+
+  public void setRecords(long records) {
+    this.records = records;
+  }
+
+  public List<?> getRows() {
+    return rows;
+  }
+
+  public void setRows(List<?> rows) {
+    this.rows = rows;
+  }
+}
+```
+
 # 单元测试
 ## Controller单元测试
 
