@@ -24,6 +24,9 @@
 	3. [切点(PointCut)](#切点pointcut)
 		1. [定义切点](#定义切点)
 	4. [使用AOP记录日志](#使用aop记录日志)
+4. [Mybatis](#mybatis)
+	1. [常见问题](#常见问题)
+		1. [test 条件判断字符串单双引号解析问题](#test-条件判断字符串单双引号解析问题)
 
 # 线程池ThreadPoolExecutor
 ## 构造参数说明
@@ -366,3 +369,28 @@ public class ScheduledTest {
 		- 获取类名: ```joinPoint.getTarget().getClass()```
         - 获取方法名: ```joinPoint.getSignature().getName()```
 		- 获取入参:  ```joinPoint.getArgs()```
+
+# Mybatis
+
+## 常见问题
+
+### test 条件判断字符串单双引号解析问题
+
+包括```<if>```和```<when>```
+
+举例：
+
+``` xml
+<when test=" paramsMap.sort == 'p' " >
+```
+应改为**单引号在外，双引号在内**
+
+``` xml
+<when test=' paramsMap.sort == "p" ' >
+```
+
+或者将单引号```'``` 换成转义字符```&quot;```
+
+``` xml
+<when test=" paramsMap.sort == &quot;p&quot; ">
+```
