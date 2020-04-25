@@ -1,41 +1,104 @@
 
 
-1. [Controller接收参数的几种常用方式](#controller接收参数的几种常用方式)
-	1. [请求路径参数](#请求路径参数)
-	2. [Body参数](#body参数)
-	3. [form表单](#form表单)
-2. [整合Hikari+Mysql+Mybatis](#整合hikarimysqlmybatis)
-	1. [pom中引入数据源驱动与mybatis依赖](#pom中引入数据源驱动与mybatis依赖)
-	2. [在yml中配置数据源和mybatis](#在yml中配置数据源和mybatis)
-	3. [在yml中配置tomcat](#在yml中配置tomcat)
-	4. [SpringBoot启动时HikariCP不创建连接池问题解决方案](#springboot启动时hikaricp不创建连接池问题解决方案)
-3. [单元测试](#单元测试)
-	1. [Controller单元测试](#controller单元测试)
-		1. [使用注解@WebMvcTes](#使用注解webmvctes)
-		2. [注意事项](#注意事项)
-			1. [与MayBatis框架整合时的坑](#与maybatis框架整合时的坑)
-			2. [使用 对service方法打桩](#使用-对service方法打桩)
-	2. [Service单元测试](#service单元测试)
-		1. [使用注解@SpringBootTest](#使用注解springboottest)
-		2. [注意事项](#注意事项)
-4. [SpringBoot基础项目文件配置](#springboot基础项目文件配置)
-	1. [引入依赖 parent](#引入依赖-parent)
-	2. [设置资源属性](#设置资源属性)
-	3. [引入依赖 dependency](#引入依赖-dependency)
-	4. [注意事项](#注意事项)
-5. [整合Swagger2](#整合swagger2)
-	1. [引入依赖](#引入依赖)
-	2. [配置文件](#配置文件)
-	3. [Swagger-ui访问路径](#swagger-ui访问路径)
-	4. [生产环境禁用Swagger](#生产环境禁用swagger)
-6. [整合日志log4j](#整合日志log4j)
-	1. [移除SpringBoot默认日志](#移除springboot默认日志)
-	2. [添加日志框架依赖](#添加日志框架依赖)
-	3. [创建log4j.properties并且放到资源文件目录src/main/resources](#创建log4jproperties并且放到资源文件目录srcmainresources)
-7. [Springboot获取request和response方式](#springboot获取request和response方式)
-	1. [静态方法获取](#静态方法获取)
-	2. [方法参数直接获取](#方法参数直接获取)
-	3. [自动注入](#自动注入)
+* [spring-boot中的读取配置文件参数](#spring-boot中的读取配置文件参数)
+	* [读取默认配置application.yaml中的参数](#读取默认配置applicationyaml中的参数)
+	* [读取自定义配置文件参数](#读取自定义配置文件参数)
+* [Controller接收参数的几种常用方式](#controller接收参数的几种常用方式)
+	* [请求路径参数](#请求路径参数)
+	* [Body参数](#body参数)
+	* [form表单](#form表单)
+* [整合Hikari+Mysql+Mybatis](#整合hikarimysqlmybatis)
+	* [pom中引入数据源驱动与mybatis依赖](#pom中引入数据源驱动与mybatis依赖)
+	* [在yml中配置数据源和mybatis](#在yml中配置数据源和mybatis)
+	* [在yml中配置tomcat](#在yml中配置tomcat)
+	* [SpringBoot启动时HikariCP不创建连接池问题解决方案](#springboot启动时hikaricp不创建连接池问题解决方案)
+	* [SpringBoot 整合Mybatis分页插件mybatis-pagehelper](#springboot-整合mybatis分页插件mybatis-pagehelper)
+		* [引入分页插件依赖](#引入分页插件依赖)
+		* [yml新增配置](#yml新增配置)
+		* [使用方式](#使用方式)
+* [单元测试](#单元测试)
+	* [Controller单元测试](#controller单元测试)
+		* [使用注解@WebMvcTes](#使用注解webmvctes)
+		* [注意事项](#注意事项)
+			* [与MayBatis框架整合时的坑](#与maybatis框架整合时的坑)
+			* [使用 对service方法打桩](#使用-对service方法打桩)
+	* [Service单元测试](#service单元测试)
+		* [使用注解@SpringBootTest](#使用注解springboottest)
+		* [注意事项](#注意事项)
+* [SpringBoot基础项目文件配置](#springboot基础项目文件配置)
+	* [引入依赖 parent](#引入依赖-parent)
+	* [设置资源属性](#设置资源属性)
+	* [引入依赖 dependency](#引入依赖-dependency)
+	* [注意事项](#注意事项)
+* [整合Swagger2](#整合swagger2)
+	* [引入依赖](#引入依赖)
+	* [配置文件](#配置文件)
+	* [Swagger-ui访问路径](#swagger-ui访问路径)
+	* [生产环境禁用Swagger](#生产环境禁用swagger)
+* [整合日志log4j](#整合日志log4j)
+	* [移除SpringBoot默认日志](#移除springboot默认日志)
+	* [添加日志框架依赖](#添加日志框架依赖)
+	* [创建log4j.properties并且放到资源文件目录src/main/resources](#创建log4jproperties并且放到资源文件目录srcmainresources)
+* [Springboot获取request和response方式](#springboot获取request和response方式)
+	* [静态方法获取](#静态方法获取)
+	* [方法参数直接获取](#方法参数直接获取)
+	* [自动注入](#自动注入)
+
+
+
+# spring-boot中的读取配置文件参数
+
+## 读取默认配置application.yaml中的参数
+
+ - 使用 注解
+  ``` @Value("${key1}")```
+  
+  	application.yaml 配置文件:
+	``` yaml
+	server:
+	  port: 8088
+	  tomcat:
+		uri-encoding: UTF-8
+	  max-http-header-size: 80KB
+	```
+	java 代码:
+	
+	``` java
+	@RestController
+	public class HelloController {
+
+		@Value("${server.port}")
+		private String port;
+
+		@GetMapping("/hello")
+		public ResponseEntity<String> hello() {
+			return new ResponseEntity<String>("hello world ~"+port, HttpStatus.OK);
+		}
+	}
+	```
+## 读取自定义配置文件参数
+
+ - config.properties
+
+	``` profile
+	user.username=hello
+	user.pass=hellow123
+	user.email=hello.qq.com
+	```
+
+ - java代码
+
+	``` java
+	@Component
+	@ConfigurationProperties(prefix = "user")
+	@PropertySource("classpath:config.properties")
+	public class User {
+		private String username;
+		private String pass;
+		private String email;
+		.........
+	}
+	```
 
 # Controller接收参数的几种常用方式
 
